@@ -18,6 +18,7 @@ public class JavaApplication11 {
      * @param elemento
      * @return 
      */
+     // Método para buscar un elemento en el arreglo
       public static boolean buscarElemento(int [] lista,int elemento){
         for (int i : lista){
             if (i == elemento){
@@ -27,31 +28,47 @@ public class JavaApplication11 {
         return false;
     }
      public static void main(String[] args) {
-        // TODO code application logic here
+           
         
+         // Método para buscar un elemento en el arreglo
         Scanner scanner = new Scanner (System.in);
         System.out.println("Cuantos Numeros desea ingresar");
          int cantidad = scanner.nextInt();
+         
+          // Método para buscar un elemento en el arreglo
          int[] arreglo = new int[cantidad];
          
+          // Método para buscar un elemento en el arreglo
             System.out.println("Ingrese los " + cantidad + " números:");
         for (int i = 0; i < cantidad; i++) {
             System.out.print("Elemento " + (i + 1) + ": ");
             arreglo[i] = scanner.nextInt();
         }
+        
+         // Método para buscar un elemento en el arreglo
         System.out.println("\nArreglo original:");
         System.out.println(Arrays.toString(arreglo));
         
+         // Método para buscar un elemento en el arreglo
         Arrays.sort(arreglo);
         
+        
+         // Método para buscar un elemento en el arreglo
         System.out.println("Arreglo ordenado:");
         System.out.println(Arrays.toString(arreglo));
         
+        
+         // Método para buscar un elemento en el arreglo
         System.out.println("\nIngrese el número a buscar en la base:");
         int elemento = scanner.nextInt();
         
+        
+         // Método para buscar un elemento en el arreglo
         boolean encontrar = buscarElemento(arreglo, elemento);
         
+        
+        
+         // Método para buscar un elemento en el arreglo
          System.out.println("\nEl elemento " + elemento);
         if (encontrar) {
             System.out.println("Sí se encuentra.");
