@@ -35,40 +35,33 @@ public class JavaApplication11 {
         System.out.println("Cuantos Numeros desea ingresar");
          int cantidad = scanner.nextInt();
          
-          // Método para buscar un elemento en el arreglo
+        
          int[] arreglo = new int[cantidad];
          
-          // Método para buscar un elemento en el arreglo
+          
             System.out.println("Ingrese los " + cantidad + " números:");
         for (int i = 0; i < cantidad; i++) {
             System.out.print("Elemento " + (i + 1) + ": ");
             arreglo[i] = scanner.nextInt();
         }
-        
-         // Método para buscar un elemento en el arreglo
+
         System.out.println("\nArreglo original:");
         System.out.println(Arrays.toString(arreglo));
         
-         // Método para buscar un elemento en el arreglo
+         
         Arrays.sort(arreglo);
         
-        
-         // Método para buscar un elemento en el arreglo
+
         System.out.println("Arreglo ordenado:");
         System.out.println(Arrays.toString(arreglo));
-        
-        
-         // Método para buscar un elemento en el arreglo
+
         System.out.println("\nIngrese el número a buscar en la base:");
         int elemento = scanner.nextInt();
         
         
-         // Método para buscar un elemento en el arreglo
         boolean encontrar = buscarElemento(arreglo, elemento);
         
         
-        
-         // Método para buscar un elemento en el arreglo
          System.out.println("\nEl elemento " + elemento);
         if (encontrar) {
             System.out.println("Sí se encuentra.");
