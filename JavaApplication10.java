@@ -26,7 +26,7 @@ public class JavaApplication10 {
         return false;
     }
      public static void main(String[] args) {
-        // TODO code application logic here
+        //
          System.out.println("ingrese el numero a buscar en la base");
         Scanner numero = new Scanner (System.in);
         int [] arreglo = {10,15,20,30}; 
