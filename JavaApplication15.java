@@ -41,7 +41,7 @@ public class JavaApplication15 {
          
          System.out.println("\nArreglo original:");
          System.out.println(Arrays.toString(arreglo));
-         
+         //n logd n tamaño de datos pequeños menor a N//
          
          Arrays.sort(arreglo);
          
