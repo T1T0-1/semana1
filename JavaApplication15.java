@@ -5,10 +5,7 @@
 package javaapplication15;
 
 import java.util.Arrays;
-import java.util.Scanner;
-
-/**
- *
+import java.util.Scanner;
  * @author Familia
  */
 public class JavaApplication15 {
@@ -40,8 +37,7 @@ public class JavaApplication15 {
          }
          
          System.out.println("\nArreglo original:");
-         System.out.println(Arrays.toString(arreglo));
-         //n logd n tamaño de datos pequeños menor a N//
+         System.out.println(Arrays.toString(arreglo))
          
          Arrays.sort(arreglo);
          
