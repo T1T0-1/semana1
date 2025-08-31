@@ -42,23 +42,5 @@ public class JavaApplication15 {
          Arrays.sort(arreglo);
          
          
-         System.out.println("Arreglo ordenado:");
-         System.out.println(Arrays.toString(arreglo));
-         
-         System.out.println("\nIngrese el número a buscar en la base:");
-         int elemento = scanner.nextInt();
-         
-         
-         boolean encontrar = buscarElemento(arreglo, elemento);
-         
-         
-         System.out.println("\nEl elemento " + elemento);
-         if (encontrar) {
-             System.out.println("Sí se encuentra.");
-         } else {
-             System.out.println("No se encontró.");
-         }
-     }
-        }
-}
+
 
