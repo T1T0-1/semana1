@@ -73,16 +73,4 @@ public class JavaApplication11 {
         }
 }
         
-         //System.out.println("ingrese el numero a buscar en la base");
-        //Scanner numero = new Scanner (System.in);
-        //int [] arreglo = {10,15,20,30}; 
-        //int elemento = numero.nextInt ();
-        //boolean encontrar = buscarElemento (arreglo,elemento);
-        //System.out.println("El elemento " + elemento );
-        //if (encontrar) {
-        //    System.out.println("si se encuentra");}
-       // else {
-        //    System.out.println("no se encontro");
-      //  }
-    // }
-     
+         
