@@ -4,10 +4,6 @@
  */
 package polifa;
 
-/**
- *
- * @author Familia
- */
 public class Polifa {
 
     /**
@@ -33,8 +29,6 @@ public class Polifa {
         try (BufferedReader br = new BufferedReader(new FileReader(archivoSalida))) {
             System.out.println(br.readLine());
         }
-    }
-        // TODO code application logic here
     }
     
 }
