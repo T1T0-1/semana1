@@ -9,7 +9,7 @@ public class Polifasico {
 
         // Crear un archivo de prueba con números desordenados
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivoEntrada))) {
-            writer.write("38 27 43 3 9 82 10 5 14 20 1");
+           writer.write("38 27 43 3 9 82 10 5 14 20 1");
         }
 
         // Ejecutar el método polifásico
@@ -85,4 +85,3 @@ public class Polifasico {
         return resultado;
     }
 }
-
