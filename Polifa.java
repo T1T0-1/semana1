@@ -1,16 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-package polifa;
+import java.io.*;
+import java.util.*;
 
-public class Polifa {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        public class Polifasico {
+public class Polifasico {
 
     public static void main(String[] args) throws IOException {
         String archivoEntrada = "datos.txt";
@@ -30,5 +21,68 @@ public class Polifa {
             System.out.println(br.readLine());
         }
     }
-    
+
+    // Método polifásico de ordenación externa
+    public static void polifasico(String archivoEntrada, String archivoSalida) throws IOException {
+        // 1. Leer todos los datos del archivo original
+        List<Integer> numeros = new ArrayList<>();
+        try (Scanner sc = new Scanner(new File(archivoEntrada))) {
+            while (sc.hasNextInt()) {
+                numeros.add(sc.nextInt());
+            }
+        }
+
+        // 2. Crear "runs" iniciales (trozos ordenados en memoria)
+        List<List<Integer>> runs = new ArrayList<>();
+        int tamañoRun = 4; // simulamos que solo podemos manejar 4 números en memoria
+        for (int i = 0; i < numeros.size(); i += tamañoRun) {
+            List<Integer> run = new ArrayList<>(numeros.subList(i, Math.min(i + tamañoRun, numeros.size())));
+            Collections.sort(run); // ordenar cada run en memoria
+            runs.add(run);
+        }
+
+        // 3. Mezcla polifásica (iterativa)
+        while (runs.size() > 1) {
+            List<List<Integer>> nuevosRuns = new ArrayList<>();
+
+            for (int i = 0; i < runs.size(); i += 2) {
+                if (i + 1 < runs.size()) {
+                    // Mezclar de dos en dos
+                    nuevosRuns.add(mezclarRuns(runs.get(i), runs.get(i + 1)));
+                } else {
+                    // Si queda uno sin par, pasa directo
+                    nuevosRuns.add(runs.get(i));
+                }
+            }
+            runs = nuevosRuns;
+        }
+
+        // 4. Guardar el archivo final ordenado
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivoSalida))) {
+            for (int num : runs.get(0)) {
+                writer.write(num + " ");
+            }
+        }
+    }
+
+    // Función que mezcla dos runs ordenados
+    private static List<Integer> mezclarRuns(List<Integer> run1, List<Integer> run2) {
+        List<Integer> resultado = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < run1.size() && j < run2.size()) {
+            if (run1.get(i) <= run2.get(j)) {
+                resultado.add(run1.get(i++));
+            } else {
+                resultado.add(run2.get(j++));
+            }
+        }
+
+        // Agregar lo que queda
+        while (i < run1.size()) resultado.add(run1.get(i++));
+        while (j < run2.size()) resultado.add(run2.get(j++));
+
+        return resultado;
+    }
 }
+
