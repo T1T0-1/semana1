@@ -65,23 +65,6 @@ public class Polifasico {
         }
     }
 
-    // Función que mezcla dos runs ordenados
-    private static List<Integer> mezclarRuns(List<Integer> run1, List<Integer> run2) {
-        List<Integer> resultado = new ArrayList<>();
-        int i = 0, j = 0;
+   
 
-        while (i < run1.size() && j < run2.size()) {
-            if (run1.get(i) <= run2.get(j)) {
-                resultado.add(run1.get(i++));
-            } else {
-                resultado.add(run2.get(j++));
-            }
-        }
 
-        // Agregar lo que queda
-        while (i < run1.size()) resultado.add(run1.get(i++));
-        while (j < run2.size()) resultado.add(run2.get(j++));
-
-        return resultado;
-    }
-}
