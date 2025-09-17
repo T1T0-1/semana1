@@ -1,20 +1,43 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-package tablas.hash;
+class Entrada {
 
-/**
- *
- * @author Familia
- */
-public class TablasHash {
+int clave;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-    
+int valor;
+
+public Entrada(int clave, int valor) this.clave = clave; this.valor = valor
+
 }
+
+{
+
+class TablaHash {
+
+private LinkedList<Entrada>[] tabla;
+
+private int tamaño;
+
+@SuppressWarnings("unchecked")
+
+public TablaHash(int tamaño) {
+
+this.tamaño = tamaño;
+
+tabla = new LinkedList[tamaño];
+
+for (int i = 0; i < tamaño; i++) { tabla[i] = new LinkedList<>();
+
+}
+
+}
+
+// Función hash private int hash(int clave) { return clave % tamaño;
+
+// Insertar (clave, valor)
+
+public void insertar(int clave,
+
+valor) {
+
+int indice = hash(clave); for (Entrada entrada :
+
+tabla[indice]) { 
