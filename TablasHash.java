@@ -1,43 +1,76 @@
+import java.util.LinkedList;
+
 class Entrada {
+    int clave;
+    int valor;
 
-int clave;
-
-int valor;
-
-public Entrada(int clave, int valor) this.clave = clave; this.valor = valor
-
+    public Entrada(int clave, int valor) {
+        this.clave = clave;
+        this.valor = valor;
+    }
 }
-
-{
 
 class TablaHash {
+    private LinkedList<Entrada>[] tabla;
+    private int tamaño;
 
-private LinkedList<Entrada>[] tabla;
+    @SuppressWarnings("unchecked")
+    public TablaHash(int tamaño) {
+        this.tamaño = tamaño;
+        tabla = new LinkedList[tamaño];
+        for (int i = 0; i < tamaño; i++) {
+            tabla[i] = new LinkedList<>();
+        }
+    }
 
-private int tamaño;
+    // Función hash
+    private int hash(int clave) {
+        return clave % tamaño;
+    }
 
-@SuppressWarnings("unchecked")
+    // Insertar (clave, valor)
+    public void insertar(int clave, int valor) {
+        int indice = hash(clave);
+        for (Entrada entrada : tabla[indice]) {
+            if (entrada.clave == clave) {
+                entrada.valor = valor; // Actualiza si ya existe
+                return;
+            }
+        }
+        tabla[indice].add(new Entrada(clave, valor));
+    }
 
-public TablaHash(int tamaño) {
+    // Buscar valor por clave
+    public Integer buscar(int clave) {
+        int indice = hash(clave);
+        for (Entrada entrada : tabla[indice]) {
+            if (entrada.clave == clave) {
+                return entrada.valor;
+            }
+        }
+        return null; // No encontrado
+    }
 
-this.tamaño = tamaño;
+    // Eliminar por clave
+    public boolean eliminar(int clave) {
+        int indice = hash(clave);
+        for (Entrada entrada : tabla[indice]) {
+            if (entrada.clave == clave) {
+                tabla[indice].remove(entrada);
+                return true;
+            }
+        }
+        return false;
+    }
 
-tabla = new LinkedList[tamaño];
-
-for (int i = 0; i < tamaño; i++) { tabla[i] = new LinkedList<>();
-
+    // Mostrar tabla hash
+    public void mostrar() {
+        for (int i = 0; i < tamaño; i++) {
+            System.out.print("[" + i + "]: ");
+            for (Entrada entrada : tabla[i]) {
+                System.out.print("(" + entrada.clave + " -> " + entrada.valor + ") ");
+            }
+            System.out.println();
+        }
+    }
 }
-
-}
-
-// Función hash private int hash(int clave) { return clave % tamaño;
-
-// Insertar (clave, valor)
-
-public void insertar(int clave,
-
-valor) {
-
-int indice = hash(clave); for (Entrada entrada :
-
-tabla[indice]) { 
