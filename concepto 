@@ -1,0 +1,161 @@
+1. Visión general y objetivo
+
+El material trata sobre tablas hash (tablas de dispersión): qué son, para qué sirven, cómo diseñar funciones de dispersión (hash functions), y cómo manejar las colisiones usando distintas técnicas (encadenamiento y direccionamiento abierto), con especial énfasis en las estrategias de exploración de direcciones. El objetivo de la sesión es que el estudiante pueda diseñar una tabla hash eficiente aplicando funciones de dispersión y técnicas de resolución de colisiones. 
+
+2. Conceptos clave
+
+Tabla Hash: estructura que almacena pares (clave → valor) y permite acceso promedio muy rápido (O(1) en el caso ideal) usando una función que transforma la clave en un índice del arreglo.
+
+Función de dispersión (hash function): toma una clave y devuelve un índice en el rango [0..m-1] (m = tamaño de la tabla). La calidad de una función se mide por su capacidad de repartir uniformemente las claves (minimizar colisiones) y por su rapidez computacional. 
+
+
+3. Ejemplos de funciones hash (explicadas)
+
+1. Hash por división
+
+Fórmula: h(k) = k mod m.
+
+Simple y rápido; elegir m apropiado (a menudo primo) ayuda a distribuir mejor.
+
+
+
+2. Método de la multiplicación
+
+Fórmula: h(k) = floor( m * frac(k * A) ), donde 0 < A < 1 y frac(x) es la parte fraccionaria de x.
+
+Menos sujeto a malas elecciones de m; A suele escogerse como (√5 − 1)/2 ≈ 0.618...
+
+
+
+3. Suma de dígitos / caracteres
+
+Consiste en sumar valores numéricos asociados a la clave (por ejemplo ASCII) y reducir por m.
+
+Muy simple, pero puede dar mala distribución si no se combina con otra técnica.
+Estos ejemplos aparecen en el documento como funciones comunes y sirven para entender ventajas/desventajas al implementarlas. 
+
+
+
+
+4. Colisiones: qué son y por qué importan
+
+Colisión ocurre cuando dos claves distintas producen el mismo índice.
+
+El manejo de colisiones es crítico: afecta directamente la eficiencia (tiempo de búsqueda/inserción) y la complejidad de la implementación.
+
+
+5. Métodos para resolver colisiones
+
+A) Encadenamiento (Chaining)
+
+Cada casilla de la tabla contiene una lista (enlazada, vector, etc.) de entradas que mapearon a ese índice.
+
+Ventajas: sencillo, eliminación fácil, puede manejar carga α > 1 (α = n/m).
+
+Desventajas: uso adicional de memoria para listas; rendimiento depende de la longitud media de las listas (O(1 + α) en promedio).
+
+
+B) Dirección abierta (Open addressing)
+
+Todas las entradas se almacenan dentro del mismo arreglo; si la posición h(k) está ocupada, se busca otra según una secuencia de exploración.
+
+Requiere que α < 1 (no hay más elementos que posiciones).
+
+Eliminación es más compleja (se suelen usar tombstones o marcas de borrado).
+
+Estrategias de exploración (explicadas en el documento):
+
+1. Sondeo lineal (Linear Probing)
+
+Secuencia: h(k,i) = (h1(k) + i) mod m para i = 0,1,2...
+
+Problema: primary clustering (agrupamiento primario), lo que empeora tiempos.
+
+
+
+2. Sondeo cuadrático (Quadratic Probing)
+
+Secuencia: h(k,i) = (h1(k) + c1*i + c2*i^2) mod m.
+
+Reduce el clustering primario, pero puede no visitar todas las celdas (depende de m y constantes).
+
+
+
+3. Doble hashing (Double Hashing)
+
+Secuencia: h(k,i) = (h1(k) + i * h2(k)) mod m (h2 distinta de h1).
+
+Generalmente la más efectiva en cuanto a distribución (reduce agrupamientos), y buena cuando se quiere un direccionamiento abierto eficiente. 
+
+
+
+
+
+6. Consideraciones prácticas y buenas prácticas
+
+Factor de carga (α = n/m): controla la probabilidad de colisiones. Mantener α bajo (p. ej. < 0.7) ayuda al rendimiento; si α crece, conviene rehash (aumentar tamaño y reinsertar).
+
+Elección de m: idealmente primo (para división) o potencia de 2 dependiendo del método; la elección afecta uniformidad.
+
+Elección de la función hash: debe ser rápida, determinista y repartir uniformemente. Evitar funciones que dependan de pocos bits de la clave.
+
+Manejo de borrados en open addressing: usar tombstones para no romper secuencias de búsqueda, y limpiar/re-hash periódicamente para evitar degradación.
+
+Medición: probar con datos reales o generados, contar colisiones y medir tiempos para elegir método apropiado. Estos puntos complementan lo propuesto en las diapositivas sobre explorar direcciones y optimizar búsqueda interna. 
+
+
+7. Complejidad (resumen)
+
+Mejor caso (buena función + baja carga): operaciones O(1) promedio (búsqueda, inserción, borrado).
+
+Peor caso: O(n) si muchas colisiones o función mala (por ejemplo, todas las claves mapean al mismo índice).
+
+Para chaining el costo promedio es O(1 + α); para open addressing el rendimiento aumenta drásticamente a medida que α se acerca a 1.
+
+
+8. Pseudocódigo breve
+
+Inserción con chaining
+
+1. idx = h(k)
+
+
+2. insertar (clave,valor) al final de la lista en tabla[idx]
+
+
+
+Inserción con linear probing
+
+1. idx = h(k)
+
+
+2. i = 0
+
+
+3. mientras tabla[(idx + i) mod m] esté ocupada: i++
+
+
+4. colocar elemento en esa posición
+
+
+
+
+9. Práctica sugerida (del documento)
+
+Implementa varias funciones hash y compara: división, multiplicación, suma de caracteres.
+
+Implementa ambas técnicas de resolución (chaining y open addressing) y mide colisiones y tiempos con distintos factores de carga.
+
+Experimenta con double hashing y con distintos tamaños m para ver el efecto en la distribución. 
+
+
+10. Preguntas de cierre y respuestas breves
+
+¿Cómo influye el manejo de colisiones en la eficiencia?
+Directamente: un manejo pobre (mala función, sondeo inadecuado) aumenta colisiones y degradación a O(n). Buen manejo mantiene operaciones en O(1) promedio.
+
+¿Qué impacto tiene la calidad de la función de dispersión?
+Una buena función reduce colisiones y evita agrupamientos, mejorando tiempos y uso de memoria.
+
+¿Por qué las tablas hash son populares para diccionarios y conjuntos?
+Porque permiten búsquedas, inserciones y borrados muy rápidos en promedio (acceso directo por clave), y son conceptualmente sencillas de usar.
