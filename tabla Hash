@@ -11,12 +11,4 @@ public class TablaHashDesdeCero {
         System.out.println("Tabla Hash inicial:");
         hash.mostrar();
 
-        // Buscar elementos
-        System.out.println("\nBuscar clave 6: " + hash.buscar(6));
-        System.out.println("Buscar clave 10: " + hash.buscar(10));
-
-        // Eliminar un elemento
-        System.out.println("\nEliminar clave 6: " + hash.eliminar(6));
-        hash.mostrar();
-    }
-}
+        
