@@ -2,13 +2,3 @@ public class TablaHashDesdeCero {
     public static void main(String[] args) {
         TablaHash hash = new TablaHash(5); // tabla de tamaño 5
 
-        // Insertar elementos
-        hash.insertar(1, 100);
-        hash.insertar(6, 200); // colisión con clave 1 (porque 6 % 5 == 1)
-        hash.insertar(11, 300); // otra colisión
-        hash.insertar(3, 150);
-
-        System.out.println("Tabla Hash inicial:");
-        hash.mostrar();
-
-        
