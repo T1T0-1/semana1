@@ -1,0 +1,113 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.sql.*;
+
+// -------------------------------
+// Clase Entrada (clave, valor)
+// -------------------------------
+class Entrada {
+    int clave;
+    int valor;
+
+    public Entrada(int clave, int valor) {
+        this.clave = clave;
+        this.valor = valor;
+    }
+}
+
+// -------------------------------
+// Clase de conexión a SQLite
+// -------------------------------
+class ConexionDB {
+    private static final String URL = "jdbc:sqlite:tablaHash.db";
+
+    // Conectar
+    public static Connection conectar() throws SQLException {
+        return DriverManager.getConnection(URL);
+    }
+
+    // Crear tabla si no existe
+    public static void crearTabla() {
+        String sql = "CREATE TABLE IF NOT EXISTS hash ("
+                   + "clave INTEGER PRIMARY KEY, "
+                   + "valor INTEGER)";
+        try (Connection conn = conectar();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// -------------------------------
+// Clase TablaHash en memoria + BD
+// -------------------------------
+class TablaHash {
+    private final LinkedList<Entrada>[] tabla;
+    private final int tamaño;
+
+    @SuppressWarnings("unchecked")
+    public TablaHash(int tamaño) {
+        this.tamaño = tamaño;
+        tabla = new LinkedList[tamaño];
+        for (int i = 0; i < tamaño; i++) {
+            tabla[i] = new LinkedList<>();
+        }
+        ConexionDB.crearTabla(); // Crea tabla en SQLite
+    }
+
+    // Función hash
+    private int hash(int clave) {
+        return clave % tamaño;
+    }
+
+    // -------------------
+    // Métodos en memoria
+    // -------------------
+    public void insertar(int clave, int valor) {
+        int indice = hash(clave);
+        for (Entrada entrada : tabla[indice]) {
+            if (entrada.clave == clave) {
+                entrada.valor = valor; // Actualiza si existe
+                return;
+            }
+        }
+        tabla[indice].add(new Entrada(clave, valor));
+    }
+
+    public Integer buscar(int clave) {
+        int indice = hash(clave);
+        for (Entrada entrada : tabla[indice]) {
+            if (entrada.clave == clave) {
+                return entrada.valor;
+            }
+        }
+        return null;
+    }
+
+    public boolean eliminar(int clave) {
+        int indice = hash(clave);
+        for (Entrada entrada : tabla[indice]) {
+            if (entrada.clave == clave) {
+                tabla[indice].remove(entrada);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String mostrar() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tamaño; i++) {
+            sb.append("[").append(i).append("]: ");
+            for (Entrada entrada : tabla[i]) {
+                sb.append("(").append(entrada.clave).append(" -> ").append(entrada.valor).append(") ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
