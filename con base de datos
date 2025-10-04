@@ -111,3 +111,32 @@ class TablaHash {
         }
         return sb.toString();
     }
+// -------------------
+    // Métodos con SQLite
+    // -------------------
+    public void insertarDB(int clave, int valor) {
+        String sql = "INSERT OR REPLACE INTO hash (clave, valor) VALUES (?, ?)";
+        try (Connection conn = ConexionDB.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clave);
+            pstmt.setInt(2, valor);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Integer buscarDB(int clave) {
+        String sql = "SELECT valor FROM hash WHERE clave = ?";
+        try (Connection conn = ConexionDB.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clave);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("valor");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
