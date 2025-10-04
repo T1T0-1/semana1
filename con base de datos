@@ -140,3 +140,23 @@ class TablaHash {
         }
         return null;
     }
+public boolean eliminarDB(int clave) {
+        String sql = "DELETE FROM hash WHERE clave = ?";
+        try (Connection conn = ConexionDB.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clave);
+            int filas = pstmt.executeUpdate();
+            return filas > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public String mostrarDB() {
+        StringBuilder sb = new StringBuilder();
+        String sql = "SELECT * FROM hash";
+        try (Connection conn = ConexionDB.conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
