@@ -160,3 +160,56 @@ public boolean eliminarDB(int clave) {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
+
+sb.append("(").append(rs.getInt("clave"))
+                  .append(" -> ").append(rs.getInt("valor"))
+                  .append(") ");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+}
+
+// -------------------------------
+// GUI con integración a BD
+// -------------------------------
+public class TablaHashGUI {
+    private static TablaHash hash;
+
+    public static void main(String[] args) {
+        hash = new TablaHash(5); // tabla de tamaño 5
+
+        // Crear ventana JFrame
+        JFrame frame = new JFrame("Tabla Hash con BD");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setLayout(new BorderLayout());
+
+        // Crear área de texto para mostrar la tabla
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        frame.add(scrollPane, BorderLayout.CENTER);
+
+        // Panel para los controles
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(3, 2));
+
+        // Campos de texto para clave y valor
+        JTextField claveField = new JTextField();
+        JTextField valorField = new JTextField();
+        panel.add(new JLabel("Clave:"));
+        panel.add(claveField);
+        panel.add(new JLabel("Valor:"));
+        panel.add(valorField);
+
+        // Botones
+        JButton insertarBtn = new JButton("Insertar");
+        JButton buscarBtn = new JButton("Buscar");
+        JButton eliminarBtn = new JButton("Eliminar");
+        panel.add(insertarBtn);
+        panel.add(buscarBtn);
+        panel.add(eliminarBtn);
+        frame.add(panel, BorderLayout.NORTH);
