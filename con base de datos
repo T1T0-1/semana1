@@ -213,3 +213,42 @@ public class TablaHashGUI {
         panel.add(buscarBtn);
         panel.add(eliminarBtn);
         frame.add(panel, BorderLayout.NORTH);
+        // Acción del botón "Insertar"
+        insertarBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int clave = Integer.parseInt(claveField.getText());
+                    int valor = Integer.parseInt(valorField.getText());
+                    // Guardar en memoria y BD
+                    hash.insertar(clave, valor);
+                    hash.insertarDB(clave, valor);
+                    textArea.setText("Insertado correctamente.\n"
+                                   + "Tabla Hash (memoria):\n" + hash.mostrar()
+                                   + "\nTabla Hash (BD):\n" + hash.mostrarDB());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Por favor, ingresa valores válidos para clave y valor.");
+                }
+            }
+        });
+
+        // Acción del botón "Buscar"
+        buscarBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int clave = Integer.parseInt(claveField.getText());
+                    Integer valorMemoria = hash.buscar(clave);
+                    Integer valorBD = hash.buscarDB(clave);
+
+                    String resultado = "Resultado de búsqueda:\n";
+                    resultado += "En memoria: " + (valorMemoria != null ? valorMemoria : "No encontrado") + "\n";
+                    resultado += "En BD: " + (valorBD != null ? valorBD : "No encontrado");
+                    textArea.setText(resultado);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Por favor, ingresa una clave válida.");
+                }
+            }
+        });
+
+
