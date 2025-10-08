@@ -250,5 +250,27 @@ public class TablaHashGUI {
                 }
             }
         });
+// Acción del botón "Eliminar"
+        eliminarBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int clave = Integer.parseInt(claveField.getText());
+                    boolean eliminadoMemoria = hash.eliminar(clave);
+                    boolean eliminadoBD = hash.eliminarDB(clave);
+
+                    textArea.setText("Eliminación:\n"
+                                   + "En memoria: " + (eliminadoMemoria ? "Eliminado" : "No encontrado") + "\n"
+                                   + "En BD: " + (eliminadoBD ? "Eliminado" : "No encontrado"));
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Por favor, ingresa una clave válida.");
+                }
+            }
+        });
+
+        // Mostrar la ventana
+        frame.setVisible(true);
+    }
+}
 
 
