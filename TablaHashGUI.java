@@ -1,11 +1,19 @@
-package tabla;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import java.awt.event.ActionListener;
 import java.util.LinkedList;
+import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
+// -------------------------------
+// Clase Entrada (clave, valor)
+// -------------------------------
 class Entrada {
     int clave;
     int valor;
@@ -16,6 +24,33 @@ class Entrada {
     }
 }
 
+// -------------------------------
+// Clase de conexión a SQLite
+// -------------------------------
+class ConexionDB {
+    private static final String URL = "jdbc:sqlite:tablaHash.db";
+
+    // Conectar
+    public static Connection conectar() throws SQLException {
+        return DriverManager.getConnection(URL);
+    }
+
+    // Crear tabla si no existe
+    public static void crearTabla() {
+        String sql = "CREATE TABLE IF NOT EXISTS hash ("
+                   + "clave INTEGER PRIMARY KEY, "
+                   + "valor INTEGER)";
+        try (Connection conn = conectar();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+        }
+    }
+}
+
+// -------------------------------
+// Clase TablaHash en memoria + BD
+// -------------------------------
 class TablaHash {
     private final LinkedList<Entrada>[] tabla;
     private final int tamaño;
@@ -27,17 +62,22 @@ class TablaHash {
         for (int i = 0; i < tamaño; i++) {
             tabla[i] = new LinkedList<>();
         }
+        ConexionDB.crearTabla(); // Crea tabla en SQLite
     }
 
+    // Función hash
     private int hash(int clave) {
         return clave % tamaño;
     }
 
+    // -------------------
+    // Métodos en memoria
+    // -------------------
     public void insertar(int clave, int valor) {
         int indice = hash(clave);
         for (Entrada entrada : tabla[indice]) {
             if (entrada.clave == clave) {
-                entrada.valor = valor; // actualizar si existe
+                entrada.valor = valor; // Actualiza si existe
                 return;
             }
         }
@@ -77,74 +117,92 @@ class TablaHash {
         return sb.toString();
     }
 
-    // 🔹 Getters para recorrer toda la tabla desde ArchivoBD
-    public int getTamaño() {
-        return tamaño;
-    }
-
-    public LinkedList<Entrada> getLista(int indice) {
-        return tabla[indice];
-    }
-}
-
-class ArchivoBD {
-    private static final String FILE = "datos.txt";
-
-    // Guardar toda la tabla hash en el archivo
-    public static void guardarTabla(TablaHash hash) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
-            for (int i = 0; i < hash.getTamaño(); i++) {
-                for (Entrada entrada : hash.getLista(i)) {
-                    bw.write(entrada.clave + "," + entrada.valor);
-                    bw.newLine();
-                }
-            }
-        } catch (IOException e) {
+    // -------------------
+    // Métodos con SQLite
+    // -------------------
+    public void insertarDB(int clave, int valor) {
+        String sql = "INSERT OR REPLACE INTO hash (clave, valor) VALUES (?, ?)";
+        try (Connection conn = ConexionDB.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clave);
+            pstmt.setInt(2, valor);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    // Cargar datos desde archivo
-    public static void cargarTabla(TablaHash hash) {
-        File f = new File(FILE);
-        if (!f.exists()) return;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] partes = linea.split(",");
-                int clave = Integer.parseInt(partes[0]);
-                int valor = Integer.parseInt(partes[1]);
-                hash.insertar(clave, valor);
+    public Integer buscarDB(int clave) {
+        String sql = "SELECT valor FROM hash WHERE clave = ?";
+        try (Connection conn = ConexionDB.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clave);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("valor");
             }
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    public boolean eliminarDB(int clave) {
+        String sql = "DELETE FROM hash WHERE clave = ?";
+        try (Connection conn = ConexionDB.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clave);
+            int filas = pstmt.executeUpdate();
+            return filas > 0;
+        } catch (SQLException e) {
+        }
+        return false;
+    }
+
+    public String mostrarDB() {
+        StringBuilder sb = new StringBuilder();
+        String sql = "SELECT * FROM hash";
+        try (Connection conn = ConexionDB.conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                sb.append("(").append(rs.getInt("clave"))
+                  .append(" -> ").append(rs.getInt("valor"))
+                  .append(") ");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 }
 
+// -------------------------------
+// GUI con integración a BD
+// -------------------------------
 public class TablaHashGUI {
     private static TablaHash hash;
 
     public static void main(String[] args) {
-        hash = new TablaHash(5); // tamaño de la tabla hash
+        hash = new TablaHash(5); // tabla de tamaño 5
 
-        // Al iniciar, cargar datos guardados
-        ArchivoBD.cargarTabla(hash);
-
-        JFrame frame = new JFrame("Tabla Hash con archivo");
+        // Crear ventana JFrame
+        JFrame frame = new JFrame("Tabla Hash con BD");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
+        frame.setSize(500, 500);
         frame.setLayout(new BorderLayout());
 
+        // Crear área de texto para mostrar la tabla
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane, BorderLayout.CENTER);
 
+        // Panel para los controles
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 2));
 
+        // Campos de texto para clave y valor
         JTextField claveField = new JTextField();
         JTextField valorField = new JTextField();
         panel.add(new JLabel("Clave:"));
@@ -152,6 +210,7 @@ public class TablaHashGUI {
         panel.add(new JLabel("Valor:"));
         panel.add(valorField);
 
+        // Botones
         JButton insertarBtn = new JButton("Insertar");
         JButton buscarBtn = new JButton("Buscar");
         JButton eliminarBtn = new JButton("Eliminar");
@@ -160,52 +219,57 @@ public class TablaHashGUI {
         panel.add(eliminarBtn);
         frame.add(panel, BorderLayout.NORTH);
 
-        // Botón Insertar
-        insertarBtn.addActionListener((ActionEvent e) -> {
+        // Acción del botón "Insertar"
+        insertarBtn.addActionListener((var e) -> {
             try {
                 int clave = Integer.parseInt(claveField.getText());
                 int valor = Integer.parseInt(valorField.getText());
+                // Guardar en memoria y BD
                 hash.insertar(clave, valor);
-                ArchivoBD.guardarTabla(hash); // Guardar cambios
-                textArea.setText("Tabla Hash después de insertar:\n" + hash.mostrar());
+                hash.insertarDB(clave, valor);
+                textArea.setText("""
+                                 Insertado correctamente.
+                                 Tabla Hash (memoria):
+                                 """ + hash.mostrar()
+                        + "\nTabla Hash (BD):\n" + hash.mostrarDB());
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Por favor, ingresa valores válidos.");
+                JOptionPane.showMessageDialog(frame, "Por favor, ingresa valores válidos para clave y valor.");
             }
         });
 
-        // Botón Buscar
+        // Acción del botón "Buscar"
         buscarBtn.addActionListener((ActionEvent e) -> {
             try {
                 int clave = Integer.parseInt(claveField.getText());
-                Integer valor = hash.buscar(clave);
-                if (valor != null) {
-                    textArea.setText("Valor encontrado: " + valor);
-                } else {
-                    textArea.setText("Clave no encontrada.");
-                }
+                Integer valorMemoria = hash.buscar(clave);
+                Integer valorBD = hash.buscarDB(clave);
+                
+                String resultado = "Resultado de búsqueda:\n";
+                resultado += "En memoria: " + (valorMemoria != null ? valorMemoria : "No encontrado") + "\n";
+                resultado += "En BD: " + (valorBD != null ? valorBD : "No encontrado");
+                textArea.setText(resultado);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Por favor, ingresa una clave válida.");
             }
         });
 
-        // Botón Eliminar
+        // Acción del botón "Eliminar"
         eliminarBtn.addActionListener((ActionEvent e) -> {
             try {
                 int clave = Integer.parseInt(claveField.getText());
-                boolean eliminado = hash.eliminar(clave);
-                if (eliminado) {
-                    ArchivoBD.guardarTabla(hash); // Guardar cambios
-                    textArea.setText("Clave " + clave + " eliminada.\n" + hash.mostrar());
-                } else {
-                    textArea.setText("Clave no encontrada.");
-                }
+                boolean eliminadoMemoria = hash.eliminar(clave);
+                boolean eliminadoBD = hash.eliminarDB(clave);
+                
+                textArea.setText("""
+                                 Eliminaci\u00f3n:
+                                 En memoria: """ + (eliminadoMemoria ? "Eliminado" : "No encontrado") + "\n"
+                                + "En BD: " + (eliminadoBD ? "Eliminado" : "No encontrado"));
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Por favor, ingresa una clave válida.");
             }
         });
 
-        // Mostrar ventana
-        textArea.setText("Tabla Hash inicial:\n" + hash.mostrar());
+        // Mostrar la ventana
         frame.setVisible(true);
     }
 }
